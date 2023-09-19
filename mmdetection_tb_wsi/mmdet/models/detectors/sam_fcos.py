@@ -1,0 +1,24 @@
+from ..builder import DETECTORS
+from .single_stage import SingleStageDetector
+
+@DETECTORS.register_module()
+class SAM_FCOS(SingleStageDetector):
+    def __init__(self,
+                 backbone,
+                 neck,
+                 bbox_head,
+                 train_cfg=None,
+                 test_cfg=None,
+                 pretrained=None,
+                 init_cfg=None):
+        super(SAM_FCOS, self).__init__(backbone, neck, bbox_head, train_cfg,
+                                   test_cfg, pretrained, init_cfg)
+        
+    def extract_feat(self, img):
+        """Directly extract features from the backbone+neck."""
+        x = self.backbone(img)
+        if self.with_neck:
+            x = self.neck(x)
+        else:
+            x = tuple([x])
+        return x
