@@ -28,6 +28,9 @@ PORT=12345 tools/dist_train.sh configs/deformable_detr_r50_16x2_50e_tct_ngc_with
 # generate smear
 python tools/tct_ngc/generate_smear_test_json.py -j 20
 
+PORT=12345 tools/dist_test_smear.sh\
+configs/deformable_detr_r50_16x2_50e_tct_ngc_smear_v4.py [前两个阶段训练好的带分类头的检测模型.pth结尾] 4 --input [待提取的数据.json结尾] --output [保存路径]
+
 #generate smear full
 python tools/tct_ngc/new_generate_smear_cls_head_full.py -j -8
 
@@ -98,4 +101,49 @@ pip install -v -e .  -i https://pypi.douban.com/simple/
 
 ## 补充：
 
-原论文的实验结果均在4张NVIDIA 3080Ti上跑来。
+原论文的实验结果均在4张NVIDIA 3080Ti上实验得来。
+
+其中`mmdetection_grx`中包含了本课题组另一个方法:[Learning Deep Pathological Features for WSI-Level Cervical Cancer Grading](https://ieeexplore.ieee.org/abstract/document/9747112/)。
+
+### 流程总览
+
+<img src="./img/grx_framework.png" alt="framework" style="zoom:75%;" />
+
+将其稍加了修改以面向非妇科肺癌数据集，该方法是一个二阶段的pipeline。
+
+### pipeline指令流程
+
+```
+# detection
+PORT=12345 tools/dist_train.sh configs/_tct_ngc_/fcos-new_r50_caffe_fpn_gn-head_1x_tct-ngc.py 4
+
+# generate smear
+python tools/tct_ngc/generate_smear_test_json.py -j 20
+
+PORT=12345 tools/dist_test_smear.sh configs/_tct_ngc_/faster_rcnn_r50_fpn_tct-ngc_smear.py  4 [第一阶段训练好的检测模型.pth结尾] 4 --input [待提取的数据.json结尾] --output [保存路径]
+
+python tools/tct_ngc/generate_smear_full.py -j 8
+
+python tools/tct_ngc/split_smear_full.py
+
+#classification
+
+cd mmclassification-tct
+
+PORT=12345 tools/dist_train.sh configs/_tct_ngc_/resnet34_tct-ngc.py 4
+```
+
+### 引用
+
+```BibTeX
+@INPROCEEDINGS{9747112,
+  author={Geng, Ruixiang and Liu, Qing and Feng, Shuo and Liang, Yixiong},
+  booktitle={ICASSP 2022 - 2022 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)}, 
+  title={Learning Deep Pathological Features for WSI-Level Cervical Cancer Grading}, 
+  year={2022},
+  volume={},
+  number={},
+  pages={1391-1395},
+  doi={10.1109/ICASSP43922.2022.9747112}}
+```
+
