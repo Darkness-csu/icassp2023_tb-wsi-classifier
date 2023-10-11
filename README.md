@@ -83,6 +83,19 @@ pip install -r requirements.txt -i https://pypi.douban.com/simple/
 pip install -v -e .  -i https://pypi.douban.com/simple/
 ```
 
+## 引用
+
+```BibTeX
+@inproceedings{li2023novel,
+  title={A Novel Transformer-Based Pipeline for Lung Cytopathological Whole Slide Image Classification},
+  author={Li, Gaojie and Liu, Qing and Liu, Haotian and Liang, Yixiong},
+  booktitle={ICASSP 2023-2023 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)},
+  pages={1--5},
+  year={2023},
+  organization={IEEE}
+}
+```
+
 ## 补充：
 
 原论文的实验结果均在4张NVIDIA 3080Ti上跑来。
